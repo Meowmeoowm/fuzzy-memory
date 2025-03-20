@@ -3,109 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Café Delight</title>
+    <title>Drawing App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            text-align: center;
             margin: 0;
             padding: 0;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            overflow-y: auto;
         }
-        header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
+
+        .bounce {
+            animation: bounce 2s infinite;
         }
-        header h1 {
-            margin: 0;
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-        nav {
-            background-color: #34495e;
-            overflow: hidden;
-        }
-        nav a {
-            color: white;
-            padding: 14px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-        }
-        nav a:hover {
-            background-color: #1abc9c;
-        }
+
         .container {
             padding: 20px;
         }
-        .menu-section, .about-section, .contact-section {
-            margin-bottom: 40px;
+
+        canvas {
+            border: 2px solid black;
+            background: white;
+            cursor: crosshair;
         }
-        h2 {
-            color: #2c3e50;
+
+        .tools {
+            margin-top: 10px;
         }
-        .menu-item {
-            padding: 10px 0;
-        }
-        footer {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
+
+        button, select {
             padding: 10px;
+            border: none;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .contact-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
         }
     </style>
 </head>
 <body>
-
-<header>
-    <h1>Café Delight</h1>
-    <p>Your favorite spot for coffee and snacks</p>
-</header>
-
-<nav>
-    <a href="#menu">Menu</a>
-    <a href="#about">About Us</a>
-    <a href="#contact">Contact</a>
-</nav>
-
-<div class="container">
-
-    <section id="menu" class="menu-section">
-        <h2>Our Menu</h2>
-        <div class="menu-item">
-            <strong>Espresso</strong> - $2.50
+    <h1 class="bounce">Welcome to the Drawing App</h1>
+    <div class="container">
+        <canvas id="drawingCanvas" width="800" height="500"></canvas>
+        <div class="tools">
+            <input type="color" id="colorPicker">
+            <select id="brushSize">
+                <option value="2">Small</option>
+                <option value="5">Medium</option>
+                <option value="10">Large</option>
+            </select>
+            <button onclick="clearCanvas()">Clear</button>
         </div>
-        <div class="menu-item">
-            <strong>Latte</strong> - $3.50
-        </div>
-        <div class="menu-item">
-            <strong>Americano</strong> - $2.75
-        </div>
-        <div class="menu-item">
-            <strong>Pastry of the Day</strong> - $2.00
-        </div>
-        <div class="menu-item">
-            <strong>Sandwich</strong> - $5.00
-        </div>
-    </section>
+    </div>
+    <button class="contact-btn" onclick="location.href='contact1.html'">Contact</button>
+    
+    <script>
+        const canvas = document.getElementById("drawingCanvas");
+        const ctx = canvas.getContext("2d");
+        let painting = false;
 
-    <section id="about" class="about-section">
-        <h2>About Us</h2>
-        <p>Welcome to Café Delight, where every cup of coffee is brewed with passion and every snack is made with care. Whether you’re stopping by for your morning espresso or enjoying an afternoon sandwich, we provide a cozy atmosphere to relax and recharge. Come for the coffee, stay for the community.</p>
-    </section>
+        function getMousePos(canvas, event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
 
-    <section id="contact" class="contact-section">
-        <h2>Contact Us</h2>
-        <p>Email: info@cafedelight.com</p>
-        <p>Phone: +123 456 7890</p>
-        <p>Address: 123 Coffee Street, Brewtown, Coffee Country</p>
-    </section>
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
 
-</div>
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
 
-<footer>
-    <p>&copy; 2024 Café Delight. All rights reserved.</p>
-</footer>
+        function draw(e) {
+            if (!painting) return;
+            const pos = getMousePos(canvas, e);
+            ctx.lineWidth = document.getElementById("brushSize").value;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = document.getElementById("colorPicker").value;
+            
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
 
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        canvas.addEventListener("mousedown", startPosition);
+        canvas.addEventListener("mouseup", endPosition);
+        canvas.addEventListener("mousemove", draw);
+    </script>
 </body>
 </html>
+
